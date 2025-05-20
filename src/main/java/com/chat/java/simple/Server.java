@@ -62,7 +62,7 @@ public class Server {
             .setResource("JavaSimpleClient")  // Adicionado recurso para identificação
             .build();
             
-        System.out.println("Server configured successfully");
+        System.out.println("✓ Server configured successfully");
         return config;    
     }
 
@@ -72,9 +72,9 @@ public class Server {
                 connection = new XMPPTCPConnection(configureServer());
                 connection.connect();
                 connection.login();
-                System.out.println("Successfully connected to server!");
+                System.out.println("✓ Successfully connected to server!");
             } catch (Exception e) {
-                System.err.println("Error connecting: " + e.getMessage());
+                System.out.println("❌ Error connecting: " + e.getMessage());
                 throw e;
             }
         }
@@ -113,7 +113,7 @@ public class Server {
             chat.send(message);
             
         } catch (Exception e) {
-            System.err.println("Error sending message: " + e.getMessage());
+            System.out.println("\n❌ Erro ao enviar mensagem: " + e.getMessage());
             throw e;
         }
     }
@@ -121,9 +121,6 @@ public class Server {
 
     public void receiveMessage() {
         try {
-			LocalDateTime dateAndTime = LocalDateTime.now();
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-		String dateHourFormated = dateAndTime.format(format);
             // Ensure we are connected
             AbstractXMPPConnection conn = createConnection();
             
@@ -134,8 +131,26 @@ public class Server {
             chatManager.addIncomingListener(new IncomingChatMessageListener() {
                 @Override
                 public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
-                    System.out.print("\n(" + dateHourFormated + ")" + "[" + from.toString() + "]: ");
-                    System.out.println(message.getBody());
+                    // Formatação melhorada para mensagens recebidas
+                    LocalDateTime now = LocalDateTime.now();
+                    DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
+                    String formattedTime = now.format(timeFormat);
+                    
+                    String sender = from.toString();
+                    String messageBody = message.getBody();
+                    
+                    // Interrompe o que o usuário estava digitando com uma nova linha
+                    System.out.println();
+                    
+                    // Exibe a mensagem recebida com formatação melhorada
+                    System.out.println("╭─────────────────────────────────────────");
+                    System.out.println("│ [" + formattedTime + "] " + sender);
+                    System.out.println("│ " + messageBody);
+                    System.out.println("╰─────────────────────────────────────────");
+                    
+                    // Exibe novamente o prompt para o usuário continuar digitando
+                    System.out.print("[" + formattedTime + "] You: ");
+                    
                     messageReceived = true; // Marca que uma mensagem foi recebida
                 }
             });
