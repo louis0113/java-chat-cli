@@ -165,11 +165,36 @@ public class Server {
         receiveMessages = false;
         if (messageReceiverThread != null && messageReceiverThread.isAlive()) {
             messageReceiverThread.interrupt();
+            try {
+                // Espera o thread terminar com um timeout
+                messageReceiverThread.join(1000);
+            } catch (InterruptedException e) {
+                System.err.println("Interrompido ao aguardar o encerramento do thread: " + e.getMessage());
+            }
         }
         
-        if (connection != null && connection.isConnected()) {
-            connection.disconnect();
-            System.out.println("Connection closed");
+        if (connection != null) {
+            try {
+                // Desabilita todos os listeners antes de desconectar
+                if (connection.isConnected()) {
+                    ChatManager chatManager = ChatManager.getInstanceFor(connection);
+                    chatManager.removeIncomingListeners();
+                    
+                    // Encerra todos os executores e threads do Smack
+                    connection.setReplyTimeout(100);
+                    connection.disconnect();
+                    System.out.println("Connection closed");
+                }
+            } catch (Exception e) {
+                System.err.println("Erro ao fechar conexão: " + e.getMessage());
+            }
+        }
+        
+        // Força o encerramento de threads pendentes do Smack
+        try {
+            org.jivesoftware.smack.util.SmackExecutorThreadFactory.shutdownAll();
+        } catch (Exception e) {
+            System.err.println("Erro ao encerrar threads do Smack: " + e.getMessage());
         }
     }
 }

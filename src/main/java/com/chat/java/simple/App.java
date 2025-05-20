@@ -58,5 +58,8 @@ public class App
 		
         in.close();
         
+        // Força o encerramento da JVM após um curto período
+        // para garantir que threads residuais não impeçam o término
+        System.exit(0);
     }
 }
