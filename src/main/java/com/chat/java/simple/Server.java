@@ -190,12 +190,9 @@ public class Server {
         
         if (connection != null) {
             try {
-                // Desabilita todos os listeners antes de desconectar
+                // Desconecta de forma limpa
                 if (connection.isConnected()) {
-                    ChatManager chatManager = ChatManager.getInstanceFor(connection);
-                    chatManager.removeIncomingListeners();
-                    
-                    // Encerra todos os executores e threads do Smack
+                    // Define um timeout curto para evitar bloqueios
                     connection.setReplyTimeout(100);
                     connection.disconnect();
                     System.out.println("✓ Connection closed");
@@ -205,9 +202,14 @@ public class Server {
             }
         }
         
-        // Força o encerramento de threads pendentes do Smack
+        // Tenta forçar o encerramento de threads pendentes
         try {
-            org.jivesoftware.smack.util.SmackExecutorThreadFactory.shutdownAll();
+            // Interrompe qualquer thread de executor que possa estar em execução
+            Thread.getAllStackTraces().keySet().forEach(thread -> {
+                if (thread.getName().contains("Smack")) {
+                    thread.interrupt();
+                }
+            });
         } catch (Exception e) {
             System.err.println("Erro ao encerrar threads do Smack: " + e.getMessage());
         }
