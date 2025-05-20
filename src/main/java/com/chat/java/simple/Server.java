@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 public class Server {
     
     private String host, friendHost, domain;
-	private User user;
+    private User user;
     private AbstractXMPPConnection connection;
     private Chat chatInstance;
     private boolean receiveMessages = false;
@@ -24,7 +24,7 @@ public class Server {
     private volatile boolean firstMessage = true;
     
     public Server(String userName, String password, String host, String friendHost, String domain) {
-		this.user = new User(userName, password);
+        this.user = new User(userName, password);
         this.host = host;
         this.friendHost = friendHost;
         this.domain = domain;
@@ -59,7 +59,7 @@ public class Server {
             .setUsernameAndPassword(user.getUserName(), user.getPassword())
             .setXmppDomain(this.domain)
             .setHost(this.host)
-            .setResource("JavaSimpleClient")  // Adicionado recurso para identificação
+            .setResource("JavaSimpleClient")  // Added resource for identification
             .build();
             
         System.out.println("✓ Server configured successfully");
@@ -102,7 +102,7 @@ public class Server {
             chat.send(message);
             
         } catch (Exception e) {
-            System.out.println("\n❌ Erro ao enviar mensagem: " + e.getMessage());
+            System.out.println("\n❌ Error sending message: " + e.getMessage());
             throw e;
         }
     }
@@ -120,7 +120,7 @@ public class Server {
             chatManager.addIncomingListener(new IncomingChatMessageListener() {
                 @Override
                 public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
-                    // Formatação melhorada para mensagens recebidas
+                    // Improved formatting for received messages
                     LocalDateTime now = LocalDateTime.now();
                     DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
                     String formattedTime = now.format(timeFormat);
@@ -128,17 +128,17 @@ public class Server {
                     String sender = from.toString();
                     String messageBody = message.getBody();
                     
-                    // Exibe a mensagem recebida com formatação melhorada
-                    System.out.print("\r"); // Limpa a linha atual
+                    // Display received message with improved formatting
+                    System.out.print("\r"); // Clear current line
                     System.out.println("╭─────────────────────────────────────────");
                     System.out.println("│ [" + formattedTime + "] " + sender);
                     System.out.println("│ " + messageBody);
                     System.out.println("╰─────────────────────────────────────────");
                     
-                    // Exibe novamente o prompt para o usuário continuar digitando
+                    // Display prompt again for user to continue typing
                     System.out.print("[" + formattedTime + "] You: ");
                     
-                    messageReceived = true; // Marca que uma mensagem foi recebida
+                    messageReceived = true; // Mark that a message was received
                 }
             });
                 
@@ -168,18 +168,18 @@ public class Server {
         if (messageReceiverThread != null && messageReceiverThread.isAlive()) {
             messageReceiverThread.interrupt();
             try {
-                // Espera o thread terminar com um timeout
+                // Wait for thread to terminate with timeout
                 messageReceiverThread.join(1000);
             } catch (InterruptedException e) {
-                System.err.println("Interrompido ao aguardar o encerramento do thread: " + e.getMessage());
+                System.err.println("Interrupted while waiting for thread termination: " + e.getMessage());
             }
         }
         
         if (connection != null) {
             try {
-                // Desconecta de forma limpa
+                // Clean disconnect
                 if (connection.isConnected()) {
-                    // Define um timeout curto para evitar bloqueios
+                    // Set short timeout to avoid blocking
                     connection.setReplyTimeout(100);
                     connection.disconnect();
                     System.out.println("✓ Connection closed");
@@ -189,16 +189,16 @@ public class Server {
             }
         }
         
-        // Tenta forçar o encerramento de threads pendentes
+        // Try to force termination of pending threads
         try {
-            // Interrompe qualquer thread de executor que possa estar em execução
+            // Interrupt any executor thread that might be running
             Thread.getAllStackTraces().keySet().forEach(thread -> {
                 if (thread.getName().contains("Smack")) {
                     thread.interrupt();
                 }
             });
         } catch (Exception e) {
-            System.err.println("Erro ao encerrar threads do Smack: " + e.getMessage());
+            System.err.println("Error terminating Smack threads: " + e.getMessage());
         }
     }
 }

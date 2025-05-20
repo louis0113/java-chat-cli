@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.Scanner;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class App 
 {
@@ -12,7 +13,7 @@ public class App
         Locale.setDefault(Locale.US);
         Scanner in = new Scanner(System.in);
         
-        // Interface de login com estilo melhorado
+        // Improved login interface
         System.out.println("\n╔══════════════════════════════════════════╗");
         System.out.println("║           XMPP CHAT - LOGIN              ║");
         System.out.println("╚══════════════════════════════════════════╝");
@@ -33,13 +34,13 @@ public class App
         String friendJid = in.nextLine();
                
         User userMain = new User(user, pass);
-        Server serverMain = new Server(user, pass, host, friendJid, dom);
+        final Server serverMain = new Server(user, pass, host, friendJid, dom);
         
         System.out.println("\n⌛ Connecting to server...");
         serverMain.createConnection();
         serverMain.receiveMessage();
         
-        // Interface do chat melhorada
+        // Improved chat interface
         System.out.println("\n╔══════════════════════════════════════════╗");
         System.out.println("║               XMPP CHAT                  ║");
         System.out.println("║                                          ║");
@@ -48,59 +49,59 @@ public class App
         System.out.println("║    /help - Show commands                 ║");
         System.out.println("╚══════════════════════════════════════════╝");
         
-        boolean executando = true;
+        final AtomicBoolean running = new AtomicBoolean(true);
         
-        // Cria um thread separado para lidar com a entrada do usuário
+        // Create a separate thread to handle user input
         Thread inputThread = new Thread(() -> {
             try {
                 do {
-                    // Atualiza a data/hora a cada mensagem
+                    // Update date/time for each message
                     LocalDateTime dateAndTime = LocalDateTime.now();
                     DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm:ss");
                     String timeFormatted = dateAndTime.format(format);
                     
                     System.out.print("\n[" + timeFormatted + "] You: ");
                     
-                    String mensagem = in.nextLine();
+                    String message = in.nextLine();
                     
-                    if (mensagem.equalsIgnoreCase("/exit") || mensagem.equals("0")) {
+                    if (message.equalsIgnoreCase("/exit") || message.equals("0")) {
                         System.out.println("\n→ Disconnecting from chat...");
-                        executando = false;
+                        running.set(false);
                         serverMain.closeConnection();
                         break;
-                    } else if (mensagem.equalsIgnoreCase("/help")) {
+                    } else if (message.equalsIgnoreCase("/help")) {
                         System.out.println("\n╔══════════════════════════════════════════╗");
                         System.out.println("║  Available Commands:                      ║");
                         System.out.println("║    /exit - Exit the chat                  ║");
                         System.out.println("║    /help - Show this help message         ║");
                         System.out.println("╚══════════════════════════════════════════╝");
-                    } else if (!mensagem.trim().isEmpty()) {
-                        // Mostra a mensagem enviada com formatação
-                        System.out.println("  ↪ " + mensagem);
-                        serverMain.sendMessageServer(mensagem);
+                    } else if (!message.trim().isEmpty()) {
+                        // Show sent message with formatting
+                        System.out.println("  ↪ " + message);
+                        serverMain.sendMessageServer(message);
                     }
                     
-                } while(executando);
+                } while(running.get());
             } catch (Exception e) {
-                System.out.println("\n❌ Erro no processamento de entrada: " + e.getMessage());
-                executando = false;
+                System.out.println("\n❌ Error processing input: " + e.getMessage());
+                running.set(false);
             }
         });
         
         inputThread.start();
         
-        // Thread principal aguarda até que o chat seja encerrado
+        // Main thread waits until chat is closed
         try {
-            while(executando) {
+            while(running.get()) {
                 Thread.sleep(500);
             }
         } catch (InterruptedException e) {
-            System.out.println("Thread principal interrompida.");
+            System.out.println("Main thread interrupted.");
         }
         
         in.close();
         
-        // Força o encerramento da JVM após um curto período
+        // Force JVM termination after a short period
         System.exit(0);
     }
 }
