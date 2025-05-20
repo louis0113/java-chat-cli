@@ -198,10 +198,10 @@ public class Server {
                     // Encerra todos os executores e threads do Smack
                     connection.setReplyTimeout(100);
                     connection.disconnect();
-                    System.out.println("Connection closed");
+                    System.out.println("✓ Connection closed");
                 }
             } catch (Exception e) {
-                System.err.println("Erro ao fechar conexão: " + e.getMessage());
+                System.out.println("❌ Error closing connection: " + e.getMessage());
             }
         }
         
