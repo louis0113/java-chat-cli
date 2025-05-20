@@ -25,7 +25,7 @@ public class User {
         this.password = password;
     }
 
-    public void mostrarInformacoes() {
+    public void showInformation() {
         System.out.println("\nUsername: " + userName +
                          "\nPassword: " + password);
     }

@@ -33,13 +33,13 @@ public class App
         Server serverMain = new Server(user, pass, host, friendJid, dom);
         
                
-        serverMain.criarConexao();
+        serverMain.createConnection();
                
-        serverMain.receberMensagem();
+        serverMain.receiveMessage();
         
         boolean executando = true;
 		
-   System.out.println("\n-----------------BEM-VINDO AO CHAT------------------\n                   To exit hit '0'            \n ");
+   System.out.println("\n-----------------WELCOME TO CHAT------------------\n                   To exit hit '0'            \n ");
    
          do{                      
 					System.out.print("\n("+ dateHourFormated
@@ -49,9 +49,9 @@ public class App
             			
 			if(mensagem.equalsIgnoreCase("0")){
 				executando = false;
-				serverMain.fecharConexao();
+				serverMain.closeConnection();
 			} else {
-				serverMain.mandarMensagemServer(mensagem);
+				serverMain.sendMessageServer(mensagem);
 			}
 			
 		 }while(executando);

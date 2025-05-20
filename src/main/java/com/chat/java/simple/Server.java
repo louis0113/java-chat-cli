@@ -52,7 +52,7 @@ public class Server {
         this.domain = domain;
     }
          
-    public XMPPTCPConnectionConfiguration configurarServer() throws Exception {
+    public XMPPTCPConnectionConfiguration configureServer() throws Exception {
         XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
             .setUsernameAndPassword(user.getUserName(), user.getPassword())
             .setXmppDomain(this.domain)
@@ -60,64 +60,64 @@ public class Server {
             .setResource("JavaSimpleClient")  // Adicionado recurso para identificação
             .build();
             
-        System.out.println("Servidor configurado com sucesso");
+        System.out.println("Server configured successfully");
         return config;    
     }
 
-    public AbstractXMPPConnection criarConexao() throws Exception {
+    public AbstractXMPPConnection createConnection() throws Exception {
         if (connection == null || !connection.isConnected()) {
             try {
-                connection = new XMPPTCPConnection(configurarServer());
+                connection = new XMPPTCPConnection(configureServer());
                 connection.connect();
                 connection.login();
-                System.out.println("Conectado ao servidor com sucesso!");
+                System.out.println("Successfully connected to server!");
             } catch (Exception e) {
-                System.err.println("Erro ao conectar: " + e.getMessage());
+                System.err.println("Error connecting: " + e.getMessage());
                 throw e;
             }
         }
         return connection;
     }
     
-    public Chat conectarChat(String conectJID) throws Exception {
+    public Chat connectChat(String connectJID) throws Exception {
         if (chatInstance == null) {
             try {
-                ChatManager chatManager = ChatManager.getInstanceFor(criarConexao());
-                EntityBareJid jid = JidCreate.entityBareFrom(conectJID);
+                ChatManager chatManager = ChatManager.getInstanceFor(createConnection());
+                EntityBareJid jid = JidCreate.entityBareFrom(connectJID);
                 chatInstance = chatManager.chatWith(jid);
                
             } catch (Exception e) {
-                System.err.println("Erro ao conectar chat: " + e.getMessage());
+                System.err.println("Error connecting to chat: " + e.getMessage());
                 throw e;
             }
         }
         return chatInstance;
     }
 
-    public void mandarMensagemServer(String mensagem) throws Exception {
+    public void sendMessageServer(String message) throws Exception {
         try {
-            Chat chat = conectarChat(friendHost);
-            chat.send(mensagem);
+            Chat chat = connectChat(friendHost);
+            chat.send(message);
             
         } catch (Exception e) {
-            System.err.println("Erro ao enviar mensagem: " + e.getMessage());
+            System.err.println("Error sending message: " + e.getMessage());
             throw e;
         }
     }
     
 
-    public void receberMensagem() {
+    public void receiveMessage() {
         try {
 			LocalDateTime dateAndTime = LocalDateTime.now();
         DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 		String dateHourFormated = dateAndTime.format(format);
-            // Garantir que estamos conectados
-            AbstractXMPPConnection conn = criarConexao();
+            // Ensure we are connected
+            AbstractXMPPConnection conn = createConnection();
             
-            // Obter o gerenciador de chat
+            // Get the chat manager
             ChatManager chatManager = ChatManager.getInstanceFor(conn);
             
-            // Configurar um ouvinte para mensagens de entrada
+            // Configure a listener for incoming messages
             chatManager.addIncomingListener(new IncomingChatMessageListener() {
                 @Override
                 public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
@@ -131,23 +131,23 @@ public class Server {
                 messageReceiverThread = new Thread(() -> {
                     try {
                         while (receiveMessages) {
-                            Thread.sleep(500); // Aguarda 500ms entre verificações
+                            Thread.sleep(500); // Wait 500ms between checks
                         }
                     } catch (InterruptedException e) {
-                        System.out.println("Receptor de mensagens interrompido.");
+                        System.out.println("Message receiver interrupted.");
                     }
                 });
-                messageReceiverThread.setDaemon(true); // Thread em segundo plano
+                messageReceiverThread.setDaemon(true); // Background thread
                 messageReceiverThread.start();
             }
             
         } catch (Exception e) {
-            System.err.println("Erro ao configurar receptor de mensagens: " + e.getMessage());
+            System.err.println("Error configuring message receiver: " + e.getMessage());
             e.printStackTrace();
         }
     }
     
-    public void fecharConexao() {
+    public void closeConnection() {
         receiveMessages = false;
         if (messageReceiverThread != null && messageReceiverThread.isAlive()) {
             messageReceiverThread.interrupt();
@@ -155,7 +155,7 @@ public class Server {
         
         if (connection != null && connection.isConnected()) {
             connection.disconnect();
-            System.out.println("Conexão fechada");
+            System.out.println("Connection closed");
         }
     }
 }
