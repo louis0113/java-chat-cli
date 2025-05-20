@@ -98,17 +98,6 @@ public class Server {
 
     public void sendMessageServer(String message) throws Exception {
         try {
-            // Na primeira mensagem, permite enviar sem esperar
-            if (firstMessage) {
-                firstMessage = false;
-            } else {
-                // Espera até que uma mensagem seja recebida
-                while (!messageReceived) {
-                    Thread.sleep(100); // Espera um pouco antes de verificar novamente
-                }
-                messageReceived = false; // Reseta o flag para a próxima mensagem
-            }
-            
             Chat chat = connectChat(friendHost);
             chat.send(message);
             
@@ -139,10 +128,8 @@ public class Server {
                     String sender = from.toString();
                     String messageBody = message.getBody();
                     
-                    // Interrompe o que o usuário estava digitando com uma nova linha
-                    System.out.println();
-                    
                     // Exibe a mensagem recebida com formatação melhorada
+                    System.out.print("\r"); // Limpa a linha atual
                     System.out.println("╭─────────────────────────────────────────");
                     System.out.println("│ [" + formattedTime + "] " + sender);
                     System.out.println("│ " + messageBody);

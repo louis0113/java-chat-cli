@@ -50,33 +50,53 @@ public class App
         
         boolean executando = true;
         
-        do {
-            // Atualiza a data/hora a cada mensagem
-            LocalDateTime dateAndTime = LocalDateTime.now();
-            DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm:ss");
-            String timeFormatted = dateAndTime.format(format);
-            
-            System.out.print("\n[" + timeFormatted + "] You: ");
-            
-            String mensagem = in.nextLine();
-            
-            if (mensagem.equalsIgnoreCase("/exit") || mensagem.equals("0")) {
-                System.out.println("\n→ Disconnecting from chat...");
+        // Cria um thread separado para lidar com a entrada do usuário
+        Thread inputThread = new Thread(() -> {
+            try {
+                do {
+                    // Atualiza a data/hora a cada mensagem
+                    LocalDateTime dateAndTime = LocalDateTime.now();
+                    DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm:ss");
+                    String timeFormatted = dateAndTime.format(format);
+                    
+                    System.out.print("\n[" + timeFormatted + "] You: ");
+                    
+                    String mensagem = in.nextLine();
+                    
+                    if (mensagem.equalsIgnoreCase("/exit") || mensagem.equals("0")) {
+                        System.out.println("\n→ Disconnecting from chat...");
+                        executando = false;
+                        serverMain.closeConnection();
+                        break;
+                    } else if (mensagem.equalsIgnoreCase("/help")) {
+                        System.out.println("\n╔══════════════════════════════════════════╗");
+                        System.out.println("║  Available Commands:                      ║");
+                        System.out.println("║    /exit - Exit the chat                  ║");
+                        System.out.println("║    /help - Show this help message         ║");
+                        System.out.println("╚══════════════════════════════════════════╝");
+                    } else if (!mensagem.trim().isEmpty()) {
+                        // Mostra a mensagem enviada com formatação
+                        System.out.println("  ↪ " + mensagem);
+                        serverMain.sendMessageServer(mensagem);
+                    }
+                    
+                } while(executando);
+            } catch (Exception e) {
+                System.out.println("\n❌ Erro no processamento de entrada: " + e.getMessage());
                 executando = false;
-                serverMain.closeConnection();
-            } else if (mensagem.equalsIgnoreCase("/help")) {
-                System.out.println("\n╔══════════════════════════════════════════╗");
-                System.out.println("║  Available Commands:                      ║");
-                System.out.println("║    /exit - Exit the chat                  ║");
-                System.out.println("║    /help - Show this help message         ║");
-                System.out.println("╚══════════════════════════════════════════╝");
-            } else if (!mensagem.trim().isEmpty()) {
-                // Mostra a mensagem enviada com formatação
-                System.out.println("  ↪ " + mensagem);
-                serverMain.sendMessageServer(mensagem);
             }
-            
-        } while(executando);
+        });
+        
+        inputThread.start();
+        
+        // Thread principal aguarda até que o chat seja encerrado
+        try {
+            while(executando) {
+                Thread.sleep(500);
+            }
+        } catch (InterruptedException e) {
+            System.out.println("Thread principal interrompida.");
+        }
         
         in.close();
         
