@@ -20,6 +20,8 @@ public class Server {
     private Chat chatInstance;
     private boolean receiveMessages = false;
     private Thread messageReceiverThread;
+    private volatile boolean messageReceived = false;
+    private volatile boolean firstMessage = true;
     
     public Server(String userName, String password, String host, String friendHost, String domain) {
 		this.user = new User(userName, password);
@@ -96,6 +98,17 @@ public class Server {
 
     public void sendMessageServer(String message) throws Exception {
         try {
+            // Na primeira mensagem, permite enviar sem esperar
+            if (firstMessage) {
+                firstMessage = false;
+            } else {
+                // Espera até que uma mensagem seja recebida
+                while (!messageReceived) {
+                    Thread.sleep(100); // Espera um pouco antes de verificar novamente
+                }
+                messageReceived = false; // Reseta o flag para a próxima mensagem
+            }
+            
             Chat chat = connectChat(friendHost);
             chat.send(message);
             
@@ -122,7 +135,8 @@ public class Server {
                 @Override
                 public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
                     System.out.print("\n(" + dateHourFormated + ")" + "[" + from.toString() + "]: ");
-                    System.out.println( message.getBody());
+                    System.out.println(message.getBody());
+                    messageReceived = true; // Marca que uma mensagem foi recebida
                 }
             });
                 
