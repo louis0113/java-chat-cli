@@ -69,6 +69,45 @@ ____ _  _ ___  ____ ____ _ ___
 ## APIs:
 - Anthropic API
 
+## Essential Information
+
+### Overview
+This is a simple XMPP chat client that runs in the command line interface. It allows users to connect to XMPP servers, register credentials, and exchange messages with other users.
+
+### Requirements
+- Java 8 or higher
+- Maven for dependency management
+
+### Installation
+```bash
+# Clone the repository
+git clone https://github.com/louis0113/xmpp-chat-cli.git
+
+# Navigate to the project directory
+cd xmpp-chat-cli
+
+# Build the project with Maven
+mvn clean install
+```
+
+### Usage
+```bash
+# Run the application
+java -jar target/simple-java-chat-1.0-SNAPSHOT.jar
+```
+
+### Configuration
+- Server: Enter your XMPP server address
+- Username: Your XMPP username
+- Password: Your XMPP password
+- Domain: The XMPP domain (usually same as server address)
+- Friend's JID: The Jabber ID of the person you want to chat with
+
+### Commands
+- `/help` - Display available commands
+- `/info` - Show your connection information
+- `/exit` - Close the chat and disconnect
+
 ## Images:
 
 ### Register
