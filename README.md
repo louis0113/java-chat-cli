@@ -85,7 +85,7 @@ ____ _  _ ___  ____ ____ _ ___
 
 ### Chat
 
-![chat](Images/Chat.png
+![chat](Images/Chat.png)
 
 ### Info
 
