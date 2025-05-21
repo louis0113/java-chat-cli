@@ -12,8 +12,7 @@ public class App
     {
         Locale.setDefault(Locale.US);
         Scanner in = new Scanner(System.in);
-        
-        // Improved login interface
+               
         System.out.println("\n╔══════════════════════════════════════════╗");
         System.out.println("║           XMPP CHAT - LOGIN              ║");
         System.out.println("╚══════════════════════════════════════════╝");
@@ -40,22 +39,21 @@ public class App
         serverMain.createConnection();
         serverMain.receiveMessage();
         
-        // Improved chat interface
         System.out.println("\n╔══════════════════════════════════════════╗");
         System.out.println("║               XMPP CHAT                  ║");
         System.out.println("║                                          ║");
         System.out.println("║  Commands:                               ║");
         System.out.println("║    /exit - Exit the chat                 ║");
         System.out.println("║    /help - Show commands                 ║");
+		System.out.println("║    /info - Show user information         ║");
         System.out.println("╚══════════════════════════════════════════╝");
         
         final AtomicBoolean running = new AtomicBoolean(true);
         
-        // Create a separate thread to handle user input
         Thread inputThread = new Thread(() -> {
             try {
                 do {
-                    // Update date/time for each message
+                   
                     LocalDateTime dateAndTime = LocalDateTime.now();
                     DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm:ss");
                     String timeFormatted = dateAndTime.format(format);
@@ -72,11 +70,18 @@ public class App
                     } else if (message.equalsIgnoreCase("/help")) {
                         System.out.println("\n╔══════════════════════════════════════════╗");
                         System.out.println("║  Available Commands:                      ║");
-                        System.out.println("║    /exit - Exit the chat                  ║");
-                        System.out.println("║    /help - Show this help message         ║");
+                        System.out.println("║    /exit - Exit the chat                 ║");
+                        System.out.println("║    /help - Show this help message        ║");
+						 System.out.println("║    /info - Show user info               ║");
                         System.out.println("╚══════════════════════════════════════════╝");
-                    } else if (!message.trim().isEmpty()) {
-                        // Show sent message with formatting
+                    } else if(message.equalsIgnoreCase("/info")){
+					   System.out.println("----------------------------------------");
+						 System.out.println("Show users informations now:");
+					   System.out.println("\nName: " + userMain.getUserName() +
+										  "\nPassword " + userMain.getPassword());
+					   System.out.println("----------------------------------------");
+					} else if (!message.trim().isEmpty()) {
+                      
                         System.out.println("  ↪ " + message);
                         serverMain.sendMessageServer(message);
                     }
@@ -90,7 +95,7 @@ public class App
         
         inputThread.start();
         
-        // Main thread waits until chat is closed
+       
         try {
             while(running.get()) {
                 Thread.sleep(500);
@@ -100,8 +105,7 @@ public class App
         }
         
         in.close();
-        
-        // Force JVM termination after a short period
+               
         System.exit(0);
     }
 }

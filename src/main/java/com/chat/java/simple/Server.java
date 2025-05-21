@@ -59,7 +59,7 @@ public class Server {
             .setUsernameAndPassword(user.getUserName(), user.getPassword())
             .setXmppDomain(this.domain)
             .setHost(this.host)
-            .setResource("JavaSimpleClient")  // Added resource for identification
+            .setResource("JavaSimpleClient") 
             .build();
             
         System.out.println("✓ Server configured successfully");
@@ -110,35 +110,33 @@ public class Server {
 
     public void receiveMessage() {
         try {
-            // Ensure we are connected
+           
             AbstractXMPPConnection conn = createConnection();
             
-            // Get the chat manager
             ChatManager chatManager = ChatManager.getInstanceFor(conn);
             
-            // Configure a listener for incoming messages
+            
             chatManager.addIncomingListener(new IncomingChatMessageListener() {
                 @Override
                 public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
-                    // Improved formatting for received messages
+                    
                     LocalDateTime now = LocalDateTime.now();
                     DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
                     String formattedTime = now.format(timeFormat);
                     
                     String sender = from.toString();
                     String messageBody = message.getBody();
-                    
-                    // Display received message with improved formatting
-                    System.out.print("\r"); // Clear current line
+                                       
+                    System.out.print("\r"); 
                     System.out.println("╭─────────────────────────────────────────");
                     System.out.println("│ [" + formattedTime + "] " + sender);
                     System.out.println("│ " + messageBody);
                     System.out.println("╰─────────────────────────────────────────");
                     
-                    // Display prompt again for user to continue typing
+                    
                     System.out.print("[" + formattedTime + "] You: ");
                     
-                    messageReceived = true; // Mark that a message was received
+                    messageReceived = true;
                 }
             });
                 
@@ -147,13 +145,13 @@ public class Server {
                 messageReceiverThread = new Thread(() -> {
                     try {
                         while (receiveMessages) {
-                            Thread.sleep(500); // Wait 500ms between checks
+                            Thread.sleep(500); 
                         }
                     } catch (InterruptedException e) {
                         System.out.println("Message receiver interrupted.");
                     }
                 });
-                messageReceiverThread.setDaemon(true); // Background thread
+                messageReceiverThread.setDaemon(true); 
                 messageReceiverThread.start();
             }
             
@@ -168,7 +166,7 @@ public class Server {
         if (messageReceiverThread != null && messageReceiverThread.isAlive()) {
             messageReceiverThread.interrupt();
             try {
-                // Wait for thread to terminate with timeout
+               
                 messageReceiverThread.join(1000);
             } catch (InterruptedException e) {
                 System.err.println("Interrupted while waiting for thread termination: " + e.getMessage());
@@ -177,9 +175,9 @@ public class Server {
         
         if (connection != null) {
             try {
-                // Clean disconnect
+               
                 if (connection.isConnected()) {
-                    // Set short timeout to avoid blocking
+                    
                     connection.setReplyTimeout(100);
                     connection.disconnect();
                     System.out.println("✓ Connection closed");
@@ -189,9 +187,8 @@ public class Server {
             }
         }
         
-        // Try to force termination of pending threads
         try {
-            // Interrupt any executor thread that might be running
+            
             Thread.getAllStackTraces().keySet().forEach(thread -> {
                 if (thread.getName().contains("Smack")) {
                     thread.interrupt();
