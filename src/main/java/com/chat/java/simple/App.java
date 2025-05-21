@@ -69,10 +69,10 @@ public class App
                         break;
                     } else if (message.equalsIgnoreCase("/help")) {
                         System.out.println("\n╔══════════════════════════════════════════╗");
-                        System.out.println("║  Available Commands:                      ║");
+                        System.out.println("║  Available Commands:                     ║");
                         System.out.println("║    /exit - Exit the chat                 ║");
                         System.out.println("║    /help - Show this help message        ║");
-						 System.out.println("║    /info - Show user info               ║");
+						 System.out.println("║    /info - Show user info                ║");
                         System.out.println("╚══════════════════════════════════════════╝");
                     } else if(message.equalsIgnoreCase("/info")){
 					   System.out.println("----------------------------------------");
