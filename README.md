@@ -92,10 +92,10 @@ This is a simple XMPP chat client that runs in the command line interface. It al
 ### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/louis0113/xmpp-chat-cli.git
+git clone https://github.com/louis0113/java-chat-cli.git
 
 # Navigate to the project directory
-cd xmpp-chat-cli
+cd java-chat-cli
 
 # Build the project with Maven
 mvn clean install
